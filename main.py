@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-
 import dns.resolver
 import ipaddress
+import socket
 
 app = FastAPI(title="Domain Reputation Checker")
 
@@ -16,75 +16,52 @@ DNSBLS = {
 }
 
 # ---------------------------
-# HOME PAGE
+# HOME
 # ---------------------------
 @app.get("/", response_class=HTMLResponse)
 async def home():
     with open("static/index.html", "r", encoding="utf-8") as f:
         return f.read()
 
-
 # ---------------------------
-# SPF CHECK
+# SPF
 # ---------------------------
 def get_spf(domain):
     try:
         answers = dns.resolver.resolve(domain, "TXT")
-
         for record in answers:
             txt = "".join(
                 s.decode() if isinstance(s, bytes) else str(s)
                 for s in record.strings
             )
-
             if "v=spf1" in txt.lower():
-                return {
-                    "exists": True,
-                    "record": txt
-                }
-
+                return txt
     except:
         pass
-
-    return {"exists": False}
-
+    return "NOT_FOUND"
 
 # ---------------------------
-# DMARC CHECK
+# DMARC
 # ---------------------------
 def get_dmarc(domain):
     try:
         answers = dns.resolver.resolve(f"_dmarc.{domain}", "TXT")
-
         for record in answers:
             txt = "".join(
                 s.decode() if isinstance(s, bytes) else str(s)
                 for s in record.strings
             )
-
             if "v=dmarc1" in txt.lower():
-                return {
-                    "exists": True,
-                    "record": txt
-                }
-
+                return txt
     except:
         pass
-
-    return {"exists": False}
-
+    return "NOT_FOUND"
 
 # ---------------------------
 # BLACKLIST CHECK
 # ---------------------------
 def check_blacklists(ip):
-    try:
-        ipaddress.ip_address(ip)
-    except:
-        return {"error": "Invalid IP"}
-
     reversed_ip = ".".join(reversed(ip.split(".")))
-
     results = {}
 
     for name, zone in DNSBLS.items():
@@ -94,7 +71,7 @@ def check_blacklists(ip):
 
             results[name] = {
                 "listed": True,
-                "codes": [str(x) for x in answers]
+                "codes": [str(a) for a in answers]
             }
 
         except dns.resolver.NXDOMAIN:
@@ -105,9 +82,8 @@ def check_blacklists(ip):
 
     return results
 
-
 # ---------------------------
-# MX RECORDS
+# MX
 # ---------------------------
 def get_mx(domain):
     records = []
@@ -124,7 +100,6 @@ def get_mx(domain):
 
                 for a in a_records:
                     ip = str(a)
-
                     ips.append({
                         "ip": ip,
                         "blacklists": check_blacklists(ip)
@@ -144,9 +119,8 @@ def get_mx(domain):
 
     return records
 
-
 # ---------------------------
-# DOMAIN CHECK API
+# DOMAIN API
 # ---------------------------
 @app.get("/domain/{domain}")
 async def domain_check(domain: str):
@@ -157,9 +131,8 @@ async def domain_check(domain: str):
         "mx": get_mx(domain)
     }
 
-
 # ---------------------------
-# SINGLE IP CHECK API
+# SINGLE IP
 # ---------------------------
 @app.get("/ip/{ip}")
 async def ip_check(ip: str):
@@ -168,9 +141,8 @@ async def ip_check(ip: str):
         "blacklists": check_blacklists(ip)
     }
 
-
 # ---------------------------
-# BULK IP SCAN (FIXED)
+# BULK IP (/24 max safe)
 # ---------------------------
 @app.get("/bulk/{cidr:path}")
 async def bulk_scan(cidr: str):
@@ -178,55 +150,26 @@ async def bulk_scan(cidr: str):
     network = ipaddress.ip_network(cidr, strict=False)
 
     if network.num_addresses > 256:
-        return {
-            "error": "Maximum range allowed is /24"
-        }
+        return {"error": "Max range allowed is /24 only"}
 
     results = []
 
     for ip in network.hosts():
-
         ip = str(ip)
 
-        check = check_blacklists(ip)
+        bl = check_blacklists(ip)
 
         status = "CLEAN"
-
-        for bl in check.values():
-            if isinstance(bl, dict) and bl.get("listed"):
-                status = "LISTED"
-                break
+        if any(v.get("listed") for v in bl.values()):
+            status = "LISTED"
 
         results.append({
             "ip": ip,
-            "status": status
+            "status": status,
+            "blacklists": bl
         })
 
-    return results
-
-
-# ---------------------------
-# RANGE CHECK API (SAFE)
-# ---------------------------
-@app.get("/range/{cidr}")
-async def range_check(cidr: str):
-
-    network = ipaddress.ip_network(cidr, strict=False)
-
-    if network.num_addresses > 256:
-        return {
-            "error": "Maximum range allowed is /24"
-        }
-
-    output = []
-
-    for ip in network.hosts():
-
-        ip = str(ip)
-
-        output.append({
-            "ip": ip,
-            "blacklists": check_blacklists(ip)
-        })
-
-    return output
+    return {
+        "range": cidr,
+        "results": results
+    }
