@@ -48,3 +48,58 @@ small {
     color:#ef4444;
     font-weight:bold;
 }
+/* -----------------------
+   THEME SYSTEM
+------------------------ */
+
+body.dark {
+    background: #0b1220;
+    color: white;
+}
+
+body.light {
+    background: #f4f6fb;
+    color: #111;
+}
+
+/* Cards */
+body.dark .card {
+    background: #111827;
+    color: white;
+}
+
+body.light .card {
+    background: white;
+    color: #111;
+    border: 1px solid #e5e7eb;
+}
+
+/* Inputs */
+body.dark input {
+    background: #1f2937;
+    color: white;
+}
+
+body.light input {
+    background: white;
+    color: black;
+}
+
+/* Buttons */
+body.light .btn-primary {
+    background: #2563eb;
+}
+
+/* Toggle button */
+.theme-toggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #3b82f6;
+    color: white;
+    z-index: 999;
+}
