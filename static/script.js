@@ -120,3 +120,25 @@ async function bulkScan(){
 
     document.getElementById("bulkResults").innerHTML = html;
 }
+// -----------------------------
+// THEME SYSTEM
+// -----------------------------
+
+function setTheme(mode){
+    document.body.className = mode;
+    localStorage.setItem("theme", mode);
+}
+
+function toggleTheme(){
+    let current = localStorage.getItem("theme") || "dark";
+
+    let newTheme = current === "dark" ? "light" : "dark";
+
+    setTheme(newTheme);
+}
+
+// Load theme on startup
+(function(){
+    let saved = localStorage.getItem("theme") || "dark";
+    setTheme(saved);
+})();
