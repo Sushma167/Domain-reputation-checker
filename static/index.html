@@ -1,123 +1,239 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Domain Reputation Dashboard</title>
+<meta charset="UTF-8">
+<title>Domain & IP Reputation Dashboard</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
 
-    <link rel="stylesheet" href="/static/style.css">
+/* =========================
+   THEME SYSTEM (FIXED)
+========================= */
+
+:root {
+    --bg: #0b1220;
+    --card: #111827;
+    --text: #ffffff;
+    --muted: #9ca3af;
+    --border: #1f2937;
+    --accent: #3b82f6;
+}
+
+body.light {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #111111;
+    --muted: #4b5563;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+}
+
+body {
+    margin: 0;
+    font-family: Arial;
+    background: var(--bg);
+    color: var(--text);
+    transition: all 0.4s ease;
+    scroll-behavior: smooth;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeIn 0.4s ease;
+    color: var(--text);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+input {
+    padding: 10px;
+    width: 70%;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* =========================
+   THEME BUTTON
+========================= */
+
+.theme-btn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 999;
+}
+
+/* =========================
+   STATUS COLORS
+========================= */
+
+.good { color: #22c55e; }
+.bad { color: #ef4444; }
+.warn { color: #f59e0b; }
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container py-5">
+<button class="theme-btn" onclick="toggleTheme()">🌓 Theme</button>
 
-    <h1 class="text-center mb-4">
-        Domain Reputation Dashboard
-    </h1>
+<div class="container">
 
-    <ul class="nav nav-tabs mb-4">
+<h2>Domain Reputation Dashboard</h2>
 
-        <li class="nav-item">
-            <button class="nav-link active"
-                    data-bs-toggle="tab"
-                    data-bs-target="#domainTab">
-                Domain Check
-            </button>
-        </li>
+<input id="domainInput" placeholder="Enter Domain">
+<button onclick="checkDomain()">Check Domain</button>
 
-        <li class="nav-item">
-            <button class="nav-link"
-                    data-bs-toggle="tab"
-                    data-bs-target="#ipTab">
-                Single IP
-            </button>
-        </li>
+<div id="domainResults"></div>
 
-        <li class="nav-item">
-            <button class="nav-link"
-                    data-bs-toggle="tab"
-                    data-bs-target="#bulkTab">
-                Bulk IP
-            </button>
-        </li>
+<hr>
 
-    </ul>
+<h2>IP Reputation Checker</h2>
 
-    <div class="tab-content">
+<input id="ipInput" placeholder="Enter IP">
+<button onclick="checkIP()">Check IP</button>
 
-        <div class="tab-pane fade show active" id="domainTab">
-
-            <div class="card shadow p-4">
-
-                <input
-                    id="domainInput"
-                    class="form-control mb-3"
-                    placeholder="example.com">
-
-                <button
-                    class="btn btn-primary"
-                    onclick="checkDomain()">
-                    Check Domain
-                </button>
-
-            </div>
-
-            <div id="domainResults" class="mt-4"></div>
-
-        </div>
-
-        <div class="tab-pane fade" id="ipTab">
-
-            <div class="card shadow p-4">
-
-                <input
-                    id="ipInput"
-                    class="form-control mb-3"
-                    placeholder="45.205.67.136">
-
-                <button
-                    class="btn btn-success"
-                    onclick="checkIP()">
-                    Check IP
-                </button>
-
-            </div>
-
-            <div id="ipResults" class="mt-4"></div>
-
-        </div>
-
-        <div class="tab-pane fade" id="bulkTab">
-
-            <div class="card shadow p-4">
-
-                <input
-                    id="cidrInput"
-                    class="form-control mb-3"
-                    placeholder="45.205.67.0/24">
-
-                <button
-                    class="btn btn-danger"
-                    onclick="bulkScan()">
-                    Scan Range
-                </button>
-
-            </div>
-
-            <div id="bulkResults" class="mt-4"></div>
-
-        </div>
-
-    </div>
+<div id="ipResults"></div>
 
 </div>
-<button onclick="toggleTheme()" class="theme-toggle">
-    🌓 Theme
-</button>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="/static/script.js"></script>
+<script>
+
+/* =========================
+   THEME FIX (GLOBAL)
+========================= */
+
+function setTheme(mode){
+    document.body.className = mode;
+    localStorage.setItem("theme", mode);
+}
+
+function toggleTheme(){
+    let current = localStorage.getItem("theme") || "dark";
+    setTheme(current === "dark" ? "light" : "dark");
+}
+
+(function(){
+    setTheme(localStorage.getItem("theme") || "dark");
+})();
+
+/* =========================
+   DOMAIN (UNCHANGED SAFE)
+========================= */
+
+async function checkDomain(){
+
+    let domain = document.getElementById("domainInput").value;
+
+    let res = await fetch(`/domain/${domain}`);
+    let data = await res.json();
+
+    document.getElementById("domainResults").innerHTML = `
+        <div class="card"><b>SPF:</b> ${JSON.stringify(data.spf)}</div>
+        <div class="card"><b>DMARC:</b> ${JSON.stringify(data.dmarc)}</div>
+        <div class="card"><b>MX:</b> ${data.mx.length}</div>
+    `;
+}
+
+/* =========================
+   IP FIX (REAL FIX HERE)
+========================= */
+
+async function checkIP(){
+
+    let ip = document.getElementById("ipInput").value;
+
+    let res = await fetch(`/ip/${ip}`);
+    let data = await res.json();
+
+    let bl = data.classification;
+
+    let html = "";
+
+    for(let k in bl){
+
+        let r = bl[k];
+
+        /* -------------------------
+           CSS-STYLE CLASSIFICATION
+        -------------------------- */
+
+        let statusText = r.status || "UNKNOWN";
+        let color = "warn";
+
+        if(statusText.includes("CLEAN")) color = "good";
+        if(statusText.includes("CSS") || statusText.includes("SUSPICIOUS")) color = "warn";
+        if(statusText.includes("XBL") || statusText.includes("LISTED")) color = "bad";
+
+        html += `
+        <div class="card">
+            <b>${k}</b><br>
+            <span class="${color}">${statusText}</span><br>
+            <small>${JSON.stringify(r.raw || r.error || [])}</small>
+        </div>`;
+    }
+
+    document.getElementById("ipResults").innerHTML = html;
+}
+
+</script>
 
 </body>
 </html>
