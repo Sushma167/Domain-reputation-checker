@@ -1,13 +1,12 @@
-async function checkDomain(){
+// -----------------------------
+// DOMAIN CHECK
+// -----------------------------
+async function checkDomain() {
 
-    let domain =
-        document.getElementById("domainInput").value;
+    let domain = document.getElementById("domainInput").value;
 
-    let res =
-        await fetch(`/domain/${domain}`);
-
-    let data =
-        await res.json();
+    let res = await fetch(`/domain/${domain}`);
+    let data = await res.json();
 
     let html = `
     <div class="row">
@@ -15,93 +14,115 @@ async function checkDomain(){
         <div class="col-md-4">
             <div class="result-card">
                 <h5>SPF</h5>
-                <p>${data.spf.length}</p>
+                <p>${data.spf && data.spf !== "NOT_FOUND" ? "FOUND" : "NOT FOUND"}</p>
+                <small>${data.spf && data.spf !== "NOT_FOUND" ? data.spf : ""}</small>
             </div>
         </div>
 
         <div class="col-md-4">
             <div class="result-card">
                 <h5>DMARC</h5>
-                <p>${data.dmarc.length}</p>
+                <p>${data.dmarc && data.dmarc !== "NOT_FOUND" ? "FOUND" : "NOT FOUND"}</p>
+                <small>${data.dmarc && data.dmarc !== "NOT_FOUND" ? data.dmarc : ""}</small>
             </div>
         </div>
 
         <div class="col-md-4">
             <div class="result-card">
                 <h5>MX</h5>
-                <p>${data.mx.length}</p>
+                <p>${Array.isArray(data.mx) ? data.mx.length : 0}</p>
             </div>
         </div>
 
     </div>
     `;
 
-    document.getElementById(
-        "domainResults"
-    ).innerHTML = html;
+    document.getElementById("domainResults").innerHTML = html;
 }
 
-async function checkIP(){
 
-    let ip =
-        document.getElementById("ipInput").value;
+// -----------------------------
+// SINGLE IP CHECK (FIXED OBJECT ISSUE)
+// -----------------------------
+async function checkIP() {
 
-    let res =
-        await fetch(`/ip/${ip}`);
+    let ip = document.getElementById("ipInput").value;
 
-    let data =
-        await res.json();
+    let res = await fetch(`/ip/${ip}`);
+    let data = await res.json();
 
-    let html = "";
+    let html = `<h4>IP: ${data.ip}</h4>`;
 
-    for(let k in data){
+    let bl = data.blacklists;
+
+    for (let key in bl) {
+
+        let status = "UNKNOWN";
+
+        if (bl[key].listed === true) status = "LISTED";
+        else if (bl[key].listed === false) status = "CLEAN";
+        else if (bl[key].error) status = "ERROR";
+
+        let color =
+            status === "LISTED" ? "red" :
+            status === "CLEAN" ? "green" : "orange";
 
         html += `
         <div class="result-card">
-            <strong>${k}</strong> :
-            ${data[k]}
+            <strong>${key}</strong> :
+            <span style="color:${color}">
+                ${status}
+            </span>
         </div>
         `;
     }
 
-    document.getElementById(
-        "ipResults"
-    ).innerHTML = html;
+    document.getElementById("ipResults").innerHTML = html;
 }
 
-async function bulkScan(){
 
-    let cidr =
-        document.getElementById("cidrInput").value;
+// -----------------------------
+// BULK IP SCAN (FIXED SAFE VERSION)
+// -----------------------------
+async function bulkScan() {
 
-    let res =
-        await fetch(`/bulk/${cidr}`);
+    let cidr = document.getElementById("cidrInput").value;
 
-    let data =
-        await res.json();
+    let res = await fetch(`/bulk/${cidr}`);
+    let data = await res.json();
 
-    let html = `
+    let html = "";
+
+    // ERROR HANDLING
+    if (data.error) {
+        document.getElementById("bulkResults").innerHTML =
+            `<p style="color:red">${data.error}</p>`;
+        return;
+    }
+
+    html += `
     <table class="table table-dark">
-
-    <tr>
-        <th>IP</th>
-        <th>Status</th>
-    </tr>
+        <tr>
+            <th>IP</th>
+            <th>Status</th>
+        </tr>
     `;
 
-    data.forEach(row => {
+    data.results.forEach(row => {
+
+        let color = row.status === "LISTED" ? "red" : "green";
 
         html += `
         <tr>
             <td>${row.ip}</td>
-            <td>${row.status}</td>
+            <td style="color:${color}">
+                ${row.status}
+            </td>
         </tr>
         `;
     });
 
     html += "</table>";
 
-    document.getElementById(
-        "bulkResults"
-    ).innerHTML = html;
+    document.getElementById("bulkResults").innerHTML = html;
 }
