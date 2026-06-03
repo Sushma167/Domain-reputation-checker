@@ -150,7 +150,9 @@ async function bulkScan(){
             `<div class="card status-bad">Bulk scan failed</div>`;
     }
 }
-
+function loader(){
+    return `<div class="card">Scanning...</div>`;
+}
 
 // -----------------------------
 // THEME SYSTEM (FIXED)
