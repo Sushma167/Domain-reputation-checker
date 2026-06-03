@@ -10,46 +10,45 @@
 
 <body>
 
-<div class="topbar">
-    <h2>Domain Reputation Dashboard</h2>
+<div class="container">
 
-    <button onclick="toggleTheme()" class="themeBtn">
-        Toggle Theme
-    </button>
-</div>
+    <h1>Domain Reputation Dashboard</h1>
 
-<!-- NAV TABS -->
-<div class="tabs">
-    <button onclick="showTab('domain')" class="tab active">Domain Check</button>
-    <button onclick="showTab('ip')" class="tab">Single IP</button>
-    <button onclick="showTab('bulk')" class="tab">Bulk IP</button>
-</div>
+    <button onclick="toggleTheme()" class="btn">Toggle Theme</button>
 
-<!-- DOMAIN -->
-<div id="domain" class="tabContent active">
+    <div class="tabs">
+        <button onclick="showTab('domain')" class="tab">Domain</button>
+        <button onclick="showTab('ip')" class="tab">Single IP</button>
+        <button onclick="showTab('bulk')" class="tab">Bulk IP</button>
+    </div>
 
-    <input id="domainInput" placeholder="Enter domain">
-    <button onclick="checkDomain()">Check Domain</button>
+    <!-- DOMAIN -->
+    <div id="domain" class="section active">
 
-    <div id="domainResults"></div>
-</div>
+        <input id="domainInput" placeholder="Enter domain">
+        <button class="btn" onclick="checkDomain()">Check</button>
 
-<!-- IP -->
-<div id="ip" class="tabContent">
+        <div id="domainResults"></div>
+    </div>
 
-    <input id="ipInput" placeholder="Enter IP">
-    <button onclick="checkIP()">Check IP</button>
+    <!-- IP -->
+    <div id="ip" class="section">
 
-    <div id="ipResults"></div>
-</div>
+        <input id="ipInput" placeholder="Enter IP">
+        <button class="btn" onclick="checkIP()">Check</button>
 
-<!-- BULK -->
-<div id="bulk" class="tabContent">
+        <div id="ipResults"></div>
+    </div>
 
-    <input id="cidrInput" placeholder="Enter CIDR (e.g. 94.183.242.0/24)">
-    <button onclick="bulkScan()">Scan Range</button>
+    <!-- BULK -->
+    <div id="bulk" class="section">
 
-    <div id="bulkResults"></div>
+        <input id="cidrInput" placeholder="CIDR e.g. 94.183.242.0/24">
+        <button class="btn" onclick="bulkScan()">Scan</button>
+
+        <div id="bulkResults"></div>
+    </div>
+
 </div>
 
 <script src="/static/script.js"></script>
@@ -57,15 +56,10 @@
 <script>
 function showTab(id){
 
-    document.querySelectorAll(".tabContent")
-        .forEach(el => el.classList.remove("active"));
-
-    document.querySelectorAll(".tab")
-        .forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".section")
+        .forEach(e => e.classList.remove("active"));
 
     document.getElementById(id).classList.add("active");
-
-    event.target.classList.add("active");
 }
 </script>
 
