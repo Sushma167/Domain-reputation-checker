@@ -5,29 +5,36 @@ function loader(){
 // ---------------- DOMAIN ----------------
 async function checkDomain(){
 
-    document.getElementById("domainResults").innerHTML = loader();
+    document.getElementById("domainResults").innerHTML =
+        `<div class="card">Scanning...</div>`;
 
     let domain = document.getElementById("domainInput").value;
 
     let res = await fetch(`/domain/${domain}`);
     let data = await res.json();
 
-    document.getElementById("domainResults").innerHTML = `
+    let spf = (data.spf && data.spf !== "NOT_FOUND") ? data.spf : "NOT FOUND";
+    let dmarc = (data.dmarc && data.dmarc !== "NOT_FOUND") ? data.dmarc : "NOT FOUND";
+    let mxCount = Array.isArray(data.mx) ? data.mx.length : 0;
+
+    let html = `
     <div class="card">
-        <h4>SPF</h4>
-        <p>${data.spf !== "NOT_FOUND" ? "FOUND" : "NOT FOUND"}</p>
+        <h4>SPF Record</h4>
+        <p>${spf}</p>
     </div>
 
     <div class="card">
-        <h4>DMARC</h4>
-        <p>${data.dmarc !== "NOT_FOUND" ? "FOUND" : "NOT FOUND"}</p>
+        <h4>DMARC Record</h4>
+        <p>${dmarc}</p>
     </div>
 
     <div class="card">
-        <h4>MX</h4>
-        <p>${data.mx.length}</p>
+        <h4>MX Records</h4>
+        <p>${mxCount}</p>
     </div>
     `;
+
+    document.getElementById("domainResults").innerHTML = html;
 }
 
 // ---------------- IP ----------------
