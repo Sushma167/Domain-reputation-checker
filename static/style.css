@@ -1,99 +1,77 @@
-:root{
-    --bg:#0f172a;
-    --card:#1e293b;
-    --text:#ffffff;
-    --muted:#94a3b8;
-    --accent:#3b82f6;
-}
-
-body.light{
-    --bg:#f1f5f9;
-    --card:#ffffff;
-    --text:#0f172a;
-    --muted:#334155;
-    --accent:#2563eb;
-}
-
 body{
     margin:0;
     font-family: Arial;
-    background:var(--bg);
-    color:var(--text);
+    background:#0f172a;
+    color:white;
     transition:0.3s;
 }
 
-/* TOP BAR */
-.topbar{
-    display:flex;
-    justify-content:space-between;
-    padding:15px 20px;
-    background:var(--card);
+/* LIGHT THEME */
+body.light{
+    background:#f1f5f9;
+    color:#0f172a;
 }
 
-/* TABS */
+.container{
+    width:90%;
+    margin:auto;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+}
+
 .tabs{
     display:flex;
     gap:10px;
-    padding:10px;
     justify-content:center;
+    margin:20px 0;
 }
 
 .tab{
     padding:10px 20px;
     border:none;
     cursor:pointer;
-    background:var(--card);
-    color:var(--text);
+    background:#1e293b;
+    color:white;
     border-radius:8px;
 }
 
-.tab.active{
-    background:var(--accent);
-}
-
-/* CONTENT */
-.tabContent{
+.section{
     display:none;
-    padding:20px;
 }
 
-.tabContent.active{
+.section.active{
     display:block;
 }
 
-/* INPUT */
 input{
     padding:10px;
     width:300px;
     border-radius:8px;
     border:none;
-    margin-right:10px;
 }
 
-/* BUTTON */
-button{
+.btn{
     padding:10px 15px;
+    background:#3b82f6;
+    color:white;
     border:none;
     border-radius:8px;
-    background:var(--accent);
-    color:white;
     cursor:pointer;
+    margin-left:10px;
 }
 
-/* CARDS */
 .card{
-    background:var(--card);
+    background:#1e293b;
     padding:15px;
     margin-top:10px;
     border-radius:10px;
-    transition:0.3s;
 }
 
-.status-good{color:#22c55e;}
-.status-bad{color:#ef4444;}
-.status-warn{color:#facc15;}
-
-.themeBtn{
-    background:transparent;
-    border:1px solid var(--text);
+/* LIGHT MODE CARD FIX */
+body.light .card{
+    background:white;
+    color:black;
 }
