@@ -40,7 +40,8 @@ async function checkDomain(){
 // ---------------- IP ----------------
 async function checkIP(){
 
-    document.getElementById("ipResults").innerHTML = loader();
+    document.getElementById("ipResults").innerHTML =
+        `<div class="card">Scanning IP...</div>`;
 
     let ip = document.getElementById("ipInput").value;
 
@@ -49,21 +50,32 @@ async function checkIP(){
 
     let html = `<div class="card"><h4>IP: ${data.ip}</h4></div>`;
 
-    for(let k in data.blacklists){
+    let bl = data.blacklists || {};
 
-        let r = data.blacklists[k];
+    for(let k in bl){
+
+        let r = bl[k];
 
         let status = "UNKNOWN";
-        let cls = "status-warn";
+        let color = "status-warn";
 
-        if(r.listed){ status="LISTED"; cls="status-bad"; }
-        else if(r.listed===false){ status="CLEAN"; cls="status-good"; }
-        else if(r.error){ status="ERROR"; cls="status-warn"; }
+        if(r.listed === true){
+            status = "LISTED";
+            color = "status-bad";
+        }
+        else if(r.listed === false){
+            status = "CLEAN";
+            color = "status-good";
+        }
+        else if(r.error){
+            status = "ERROR";
+            color = "status-warn";
+        }
 
         html += `
         <div class="card">
-            <b>${k}</b> :
-            <span class="${cls}">${status}</span>
+            <b>${k}</b><br>
+            <span class="${color}">${status}</span>
         </div>
         `;
     }
