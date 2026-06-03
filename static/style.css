@@ -3,10 +3,22 @@ body{
     color:white;
 }
 
-.card{
-    background:#1f2937;
-    border:none;
-    border-radius:15px;
+.card {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    color: #ffffff;   /* ✅ FIX: text visibility */
+}
+
+p, h4, h5, span {
+    color: #ffffff;   /* ✅ FORCE visibility */
+}
+
+small {
+    color: #9ca3af;   /* softer text */
 }
 
 .form-control{
