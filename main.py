@@ -204,7 +204,40 @@ async def ip_check(ip: str):
         "ip": ip,
         "blacklists": check_blacklists(ip)
     }
+import ipaddress
 
+@app.get("/bulk/{cidr:path}")
+async def bulk_scan(cidr: str):
+
+    network = ipaddress.ip_network(
+        cidr,
+        strict=False
+    )
+
+    if network.num_addresses > 256:
+        return {
+            "error": "Maximum range allowed is /24"
+        }
+
+    results = []
+
+    for ip in network.hosts():
+
+        ip = str(ip)
+
+        check = check_blacklists(ip)
+
+        status = "CLEAN"
+
+        if any(v == "LISTED" for v in check.values()):
+            status = "LISTED"
+
+        results.append({
+            "ip": ip,
+            "status": status
+        })
+
+    return results
 
 # ---------------------------
 # RANGE CHECK API
