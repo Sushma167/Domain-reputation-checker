@@ -1,61 +1,48 @@
-body{
+<!DOCTYPE html>
+<html>
 
-    font-family:Arial;
+<head>
 
-    background:#f5f5f5;
+    <title>Domain Reputation Checker</title>
 
-    margin:0;
+    <link rel="stylesheet" href="/static/style.css">
 
-    padding:50px;
-}
+</head>
 
-.container{
+<body>
 
-    background:white;
+<div class="container">
 
-    padding:30px;
+<h1>Domain Reputation Checker</h1>
 
-    border-radius:10px;
+<input
+id="domain"
+placeholder="example.com">
 
-    max-width:900px;
+<button onclick="checkDomain()">
+Check Domain
+</button>
 
-    margin:auto;
+<div id="result"></div>
 
-    box-shadow:0 0 15px rgba(0,0,0,.1);
-}
+<hr>
 
-input{
+<h1>IP Checker</h1>
 
-    width:70%;
+<input
+id="ip"
+placeholder="8.8.8.8">
 
-    padding:10px;
+<button onclick="checkIP()">
+Check IP
+</button>
 
-    margin-bottom:10px;
-}
+<div id="ipresult"></div>
 
-button{
+</div>
 
-    padding:10px 20px;
+<script src="/static/script.js"></script>
 
-    background:#007bff;
+</body>
 
-    color:white;
-
-    border:none;
-
-    cursor:pointer;
-}
-
-button:hover{
-
-    opacity:.8;
-}
-
-pre{
-
-    background:#eee;
-
-    padding:15px;
-
-    overflow:auto;
-}
+</html>
