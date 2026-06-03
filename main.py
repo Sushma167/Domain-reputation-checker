@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Domain Reputation Checker</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Domain Reputation Checker</h1>
+
+<input
+id="domain"
+placeholder="example.com">
+
+<button onclick="checkDomain()">
+Check Domain
+</button>
+
+<div id="result"></div>
+
+<hr>
+
+<h1>IP Checker</h1>
+
+<input
+id="ip"
+placeholder="8.8.8.8">
+
+<button onclick="checkIP()">
+Check IP
+</button>
+
+<div id="ipresult"></div>
+
+</div>
+
+<script src="/static/script.js"></script>
+
+</body>
+
+</html>
