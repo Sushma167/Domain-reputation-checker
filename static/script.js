@@ -1,78 +1,62 @@
-// -----------------------------
-// DOMAIN CHECK
-// -----------------------------
-async function checkDomain() {
+function loader(){
+    return `<div class="card">Scanning...</div>`;
+}
+
+// ---------------- DOMAIN ----------------
+async function checkDomain(){
+
+    document.getElementById("domainResults").innerHTML = loader();
 
     let domain = document.getElementById("domainInput").value;
 
     let res = await fetch(`/domain/${domain}`);
     let data = await res.json();
 
-    let html = `
-    <div class="row">
+    document.getElementById("domainResults").innerHTML = `
+    <div class="card">
+        <h4>SPF</h4>
+        <p>${data.spf !== "NOT_FOUND" ? "FOUND" : "NOT FOUND"}</p>
+    </div>
 
-        <div class="col-md-4">
-            <div class="result-card">
-                <h5>SPF</h5>
-                <p>${data.spf && data.spf !== "NOT_FOUND" ? "FOUND" : "NOT FOUND"}</p>
-                <small>${data.spf && data.spf !== "NOT_FOUND" ? data.spf : ""}</small>
-            </div>
-        </div>
+    <div class="card">
+        <h4>DMARC</h4>
+        <p>${data.dmarc !== "NOT_FOUND" ? "FOUND" : "NOT FOUND"}</p>
+    </div>
 
-        <div class="col-md-4">
-            <div class="result-card">
-                <h5>DMARC</h5>
-                <p>${data.dmarc && data.dmarc !== "NOT_FOUND" ? "FOUND" : "NOT FOUND"}</p>
-                <small>${data.dmarc && data.dmarc !== "NOT_FOUND" ? data.dmarc : ""}</small>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="result-card">
-                <h5>MX</h5>
-                <p>${Array.isArray(data.mx) ? data.mx.length : 0}</p>
-            </div>
-        </div>
-
+    <div class="card">
+        <h4>MX</h4>
+        <p>${data.mx.length}</p>
     </div>
     `;
-
-    document.getElementById("domainResults").innerHTML = html;
 }
 
+// ---------------- IP ----------------
+async function checkIP(){
 
-// -----------------------------
-// SINGLE IP CHECK (FIXED OBJECT ISSUE)
-// -----------------------------
-async function checkIP() {
+    document.getElementById("ipResults").innerHTML = loader();
 
     let ip = document.getElementById("ipInput").value;
 
     let res = await fetch(`/ip/${ip}`);
     let data = await res.json();
 
-    let html = `<h4>IP: ${data.ip}</h4>`;
+    let html = `<div class="card"><h4>IP: ${data.ip}</h4></div>`;
 
-    let bl = data.blacklists;
+    for(let k in data.blacklists){
 
-    for (let key in bl) {
+        let r = data.blacklists[k];
 
         let status = "UNKNOWN";
+        let cls = "status-warn";
 
-        if (bl[key].listed === true) status = "LISTED";
-        else if (bl[key].listed === false) status = "CLEAN";
-        else if (bl[key].error) status = "ERROR";
-
-        let color =
-            status === "LISTED" ? "red" :
-            status === "CLEAN" ? "green" : "orange";
+        if(r.listed){ status="LISTED"; cls="status-bad"; }
+        else if(r.listed===false){ status="CLEAN"; cls="status-good"; }
+        else if(r.error){ status="ERROR"; cls="status-warn"; }
 
         html += `
-        <div class="result-card">
-            <strong>${key}</strong> :
-            <span style="color:${color}">
-                ${status}
-            </span>
+        <div class="card">
+            <b>${k}</b> :
+            <span class="${cls}">${status}</span>
         </div>
         `;
     }
@@ -80,49 +64,40 @@ async function checkIP() {
     document.getElementById("ipResults").innerHTML = html;
 }
 
+// ---------------- BULK ----------------
+async function bulkScan(){
 
-// -----------------------------
-// BULK IP SCAN (FIXED SAFE VERSION)
-// -----------------------------
-async function bulkScan() {
+    document.getElementById("bulkResults").innerHTML = loader();
 
     let cidr = document.getElementById("cidrInput").value;
 
     let res = await fetch(`/bulk/${cidr}`);
     let data = await res.json();
 
-    let html = "";
-
-    // ERROR HANDLING
-    if (data.error) {
+    if(data.error){
         document.getElementById("bulkResults").innerHTML =
-            `<p style="color:red">${data.error}</p>`;
+            `<div class="card status-bad">${data.error}</div>`;
         return;
     }
 
-    html += `
+    let html = `
+    <div class="card">
     <table class="table table-dark">
-        <tr>
-            <th>IP</th>
-            <th>Status</th>
-        </tr>
+        <tr><th>IP</th><th>Status</th></tr>
     `;
 
-    data.results.forEach(row => {
-
-        let color = row.status === "LISTED" ? "red" : "green";
+    data.results.forEach(r=>{
+        let color = r.status==="LISTED" ? "status-bad" : "status-good";
 
         html += `
         <tr>
-            <td>${row.ip}</td>
-            <td style="color:${color}">
-                ${row.status}
-            </td>
+            <td>${r.ip}</td>
+            <td class="${color}">${r.status}</td>
         </tr>
         `;
     });
 
-    html += "</table>";
+    html += "</table></div>";
 
     document.getElementById("bulkResults").innerHTML = html;
 }
